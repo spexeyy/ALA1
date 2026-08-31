@@ -1,17 +1,19 @@
-import { DIFICULTADES, ESTADOS } from "../constantes/tarea.js";
+import { ESTADOS, DIFICULTADES } from "../constantes/tarea.js";
 
-export const crearTarea = (titulo, descripcion) => {
-    if (!titulo) {
-        console.log("El titulo es obligatorio");
+export const crearTarea = (id, titulo, descripcion) => {
+    if (!titulo || titulo.trim() === "") {
         return null;
     }
 
+    const ahora = new Date();
+
     return {
-        titulo,
+        id,
+        titulo: titulo.trim(),
         descripcion,
         estado: ESTADOS.PENDIENTE,
-        fechaCreacion: new Date(),
-        fechaModificacion: new Date(),
+        fechaCreacion: ahora,
+        fechaModificacion: ahora,
         vencimiento: null,
         dificultad: DIFICULTADES.UNA_ESTRELLA,
     };

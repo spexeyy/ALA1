@@ -1,11 +1,6 @@
-import { ESTADOS, DIFICULTADES } from "./constantes/tarea.js"
-import {
-    agregarTarea,
-    cambiarEstado,
-    cambiarDificultad,
-    obtenerTareas
-} from "./servicios/servicioTarea.js";
+import { agregarTarea, obtenerTareas } from "./servicios/servicioTarea.js";
+import { mostrarTareas } from "./vistas/vistaTarea.js";
 
-    const tarea1 = agregarTarea("bueee", "anachex");
+agregarTarea("bueee", "anachex");
 
-    mostrarTareas();
+mostrarTareas(obtenerTareas());
