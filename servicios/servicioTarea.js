@@ -2,57 +2,84 @@ import { ESTADOS, DIFICULTADES } from "../constantes/tarea.js";
 import { crearTarea } from "../modelos/tarea.js";
 
 const tareas = [];
-let siguienteId = 1;
+let siguienteId = 0;
 
 const actualizarFechaModificacion = (tarea) => {
-    tarea.fechaModificacion = new Date();
+  tarea.fechaModificacion = new Date();
 };
 
 const esEstadoValido = (estado) => {
-    return Object.values(ESTADOS).includes(estado);
+  return Object.values(ESTADOS).includes(estado);
 };
 
 const esDificultadValida = (dificultad) => {
-    return Object.values(DIFICULTADES).includes(dificultad);
+  return Object.values(DIFICULTADES).includes(dificultad);
+};
+
+export const hayTareas = () => {
+  return tareas.length > 0;
+};
+
+
+const buscarTareaPorId = (id) => {
+  for (const tarea of tareas) {
+    if (tarea.id === id) {
+      return tarea;
+    }
+  }
+
+  return null;
 };
 
 export const agregarTarea = (titulo, descripcion) => {
-    const tarea = crearTarea(siguienteId, titulo, descripcion);
+  const tarea = crearTarea(siguienteId, titulo, descripcion);
 
-    if (!tarea) {
-        return null;
-    }
+  if (!tarea) {
+    return null;
+  }
 
-    siguienteId++;
-    tareas.push(tarea);
+  siguienteId++;
+  tareas.push(tarea);
 
-    return tarea;
+  return tarea;
 };
 
-// TODO: cambiar estado y dificultad por id en vez de objeto
+export const cambiarEstado = (id, nuevoEstado) => {
+  if (!esEstadoValido(nuevoEstado)) {
+    return false;
+  }
 
-export const cambiarEstado = (tarea, nuevoEstado) => {
-    if (!tarea || !esEstadoValido(nuevoEstado)) {
-        return false;
-    }
+  // reemplazar con .find cuando sea posible
+  const tarea = buscarTareaPorId(id);
 
-    tarea.estado = nuevoEstado;
-    actualizarFechaModificacion(tarea);
+  if (!tarea) {
+    return false;
+  }
 
-    return true;
+  tarea.estado = nuevoEstado;
+  actualizarFechaModificacion(tarea);
+
+  return true;
 };
 
-export const cambiarDificultad = (tarea, nuevaDificultad) => {
-    if (!tarea || !esDificultadValida(nuevaDificultad)) {
-        return false;
-    }
+export const cambiarDificultad = (id, nuevaDificultad) => {
+  if (!esDificultadValida(nuevaDificultad)) {
+    return false;
+  }
 
-    tarea.dificultad = nuevaDificultad;
-    actualizarFechaModificacion(tarea);
+  // reemplazar con .find cuando sea posible
+  const tarea = buscarTareaPorId(id);
 
-    return true;
+  if (!tarea) {
+    return false;
+  }
+
+  tarea.dificultad = nuevaDificultad;
+  actualizarFechaModificacion(tarea);
+
+  return true;
 };
 
 export const obtenerTareas = () => {
-    return [...tareas];
+  return [...tareas];
 };

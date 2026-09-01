@@ -1,22 +1,29 @@
+import { obtenerTareas, hayTareas } from "../servicios/servicioTarea.js";
+
 const mostrarDificultad = (dificultad) => {
-    return "★".repeat(dificultad)
-}
+  return "★".repeat(dificultad);
+};
 
 export const mostrarTarea = (tarea) => {
-    console.log(`
+  console.log(`
         Id: ${tarea.id}
-        Título: ${tarea.titulo}
+        Titulo: ${tarea.titulo}
         Descripción: ${tarea.descripcion}
         Estado: ${tarea.estado}
         Dificultad: ${mostrarDificultad(tarea.dificultad)}
         Creada: ${tarea.fechaCreacion}
         Modificada: ${tarea.fechaModificacion}
-        Vencimiento: ${tarea.vencimiento}`
-        );
+        Vencimiento: ${tarea.vencimiento ? tarea.vencimiento : "Sin vencimiento"}`)
 };
 
-export const mostrarTareas = (tareas) => {
-    tareas.forEach((tarea) => {
-        mostrarTarea(tarea);
-    });
+
+export const mostrarTareas = () => {
+  if (!hayTareas()) {
+    console.log("No hay tareas");
+    return;
+  }
+
+  for (const tarea of obtenerTareas()) {
+    mostrarTarea(tarea);
+  }
 };

@@ -1,6 +1,3 @@
-import { agregarTarea, obtenerTareas } from "./servicios/servicioTarea.js";
-import { mostrarTareas } from "./vistas/vistaTarea.js";
+import { mostrarMenu } from "./vistas/vistaMenu.js";
 
-agregarTarea("bueee", "anachex");
-
-mostrarTareas(obtenerTareas());
+mostrarMenu();
