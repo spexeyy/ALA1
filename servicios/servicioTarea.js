@@ -1,8 +1,13 @@
 import { ESTADOS, DIFICULTADES } from "../constantes/tarea.js";
-import { crearTarea } from "../modelos/tarea.js";
+import { ERRORES } from "../constantes/errores.js"
+import { crearTarea } from "../modelos/modeloTarea.js";
 
 const tareas = [];
-let siguienteId = 0;
+let siguienteId = 1;
+
+const exito = (valor = null) => ({ ok: true, valor });
+
+const fallo = (error) => ({ ok: false, error });
 
 const actualizarFechaModificacion = (tarea) => {
   tarea.fechaModificacion = new Date();
@@ -20,6 +25,21 @@ export const hayTareas = () => {
   return tareas.length > 0;
 };
 
+export const filtrarTareasPorEstado = (estado) => {
+  if (!esEstadoValido(estado)) {
+    return fallo(ERRORES.ESTADO_INVALIDO);
+  }
+
+  const encontrados = [];
+
+  for (const tarea of tareas) {
+    if (tarea.estado === estado) {
+      encontrados.push(tarea);
+    }
+  }
+
+  return exito(encontrados);
+}
 
 const buscarTareaPorId = (id) => {
   for (const tarea of tareas) {
@@ -32,52 +52,52 @@ const buscarTareaPorId = (id) => {
 };
 
 export const agregarTarea = (titulo, descripcion) => {
-  const tarea = crearTarea(siguienteId, titulo, descripcion);
-
-  if (!tarea) {
-    return null;
+  if (!titulo || titulo.trim() === "") {
+    return fallo(ERRORES.TITULO_VACIO);
   }
 
-  siguienteId++;
-  tareas.push(tarea);
+  const tarea = crearTarea(siguienteId, titulo, descripcion);
 
-  return tarea;
+  tareas.push(tarea);
+  siguienteId++;
+
+  return exito(tarea);
 };
 
 export const cambiarEstado = (id, nuevoEstado) => {
   if (!esEstadoValido(nuevoEstado)) {
-    return false;
+    return fallo(ERRORES.ESTADO_INVALIDO);
   }
 
   // reemplazar con .find cuando sea posible
   const tarea = buscarTareaPorId(id);
 
   if (!tarea) {
-    return false;
+    return fallo(ERRORES.TAREA_NO_ENCONTRADA);
   }
 
   tarea.estado = nuevoEstado;
   actualizarFechaModificacion(tarea);
 
-  return true;
+  return exito(tarea);
 };
 
 export const cambiarDificultad = (id, nuevaDificultad) => {
   if (!esDificultadValida(nuevaDificultad)) {
-    return false;
+    return fallo(ERRORES.DIFICULTAD_INVALIDA);
   }
 
   // reemplazar con .find cuando sea posible
   const tarea = buscarTareaPorId(id);
 
   if (!tarea) {
-    return false;
+    return fallo(ERRORES.TAREA_NO_ENCONTRADA);
   }
 
   tarea.dificultad = nuevaDificultad;
   actualizarFechaModificacion(tarea);
 
-  return true;
+  return exito(tarea);
 };
 
 export const obtenerTareas = () => {

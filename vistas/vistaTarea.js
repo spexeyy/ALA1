@@ -1,29 +1,34 @@
-import { obtenerTareas, hayTareas } from "../servicios/servicioTarea.js";
+import { obtenerTareas } from "../servicios/servicioTarea.js";
+import { ERRORES } from "../constantes/errores.js";
 
 const mostrarDificultad = (dificultad) => {
   return "★".repeat(dificultad);
 };
 
-export const mostrarTarea = (tarea) => {
-  console.log(`
-        Id: ${tarea.id}
-        Titulo: ${tarea.titulo}
-        Descripción: ${tarea.descripcion}
-        Estado: ${tarea.estado}
-        Dificultad: ${mostrarDificultad(tarea.dificultad)}
-        Creada: ${tarea.fechaCreacion}
-        Modificada: ${tarea.fechaModificacion}
-        Vencimiento: ${tarea.vencimiento ? tarea.vencimiento : "Sin vencimiento"}`)
+const formatearFecha = (fecha) => {
+  return fecha.toLocaleString("es-AR", { hour12: false });
 };
 
+export const mostrarTarea = (tarea) => {
+  console.log(`
+ID: ${tarea.id}
+Titulo: ${tarea.titulo}
+Descripción: ${tarea.descripcion}
+Estado: ${tarea.estado}
+Dificultad: ${mostrarDificultad(tarea.dificultad)}
+Creada: ${formatearFecha(tarea.fechaCreacion)}
+Modificada: ${formatearFecha(tarea.fechaModificacion)}
+Vencimiento: ${tarea.vencimiento ? formatearFecha(tarea.vencimiento) : "Sin vencimiento"}`)
+};
 
-export const mostrarTareas = () => {
-  if (!hayTareas()) {
-    console.log("No hay tareas");
+// Sin argumento muestra todas; con una lista muestra esa lista.
+export const mostrarTareas = (tareas = obtenerTareas()) => {
+  if (tareas.length === 0) {
+    console.log(ERRORES.SIN_TAREAS);
     return;
   }
 
-  for (const tarea of obtenerTareas()) {
+  for (const tarea of tareas) {
     mostrarTarea(tarea);
   }
 };

@@ -1,16 +1,12 @@
 import { ESTADOS, DIFICULTADES } from "../constantes/tarea.js";
 
-export const crearTarea = (id, titulo, descripcion) => {
-  if (!titulo || titulo.trim() === "") {
-    return null;
-  }
-
+export const crearTarea = (id, titulo, descripcion = "") => {
   const ahora = new Date();
 
   return {
     id,
     titulo: titulo.trim(),
-    descripcion,
+    descripcion: descripcion.trim(),
     estado: ESTADOS.PENDIENTE,
     fechaCreacion: ahora,
     fechaModificacion: ahora,

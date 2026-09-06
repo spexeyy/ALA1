@@ -3,10 +3,38 @@ import {
   agregarTarea,
   cambiarEstado,
   cambiarDificultad,
-  setearVencimiento,
+  filtrarTareasPorEstado,
   hayTareas,
+  obtenerTareas,
 } from "../servicios/servicioTarea.js";
 import { mostrarTareas } from "./vistaTarea.js";
+import { ERRORES } from "../constantes/errores.js"
+import { ESTADOS } from "../constantes/tarea.js";
+
+// Submenu de "Ver tareas". Devuelve la lista elegida, o null si el usuario vuelve.
+const elegirVista = () => {
+  const estados = Object.values(ESTADOS);
+  const opciones = [`Todas (${obtenerTareas().length})`];
+
+  for (const estado of estados) {
+    opciones.push(`${estado} (${filtrarTareasPorEstado(estado).valor.length})`);
+  }
+
+  const indice = rl.keyInSelect(opciones, "Ver: ", {
+    cancel: "Volver",
+    guide: false,
+  });
+
+  if (indice === -1) {
+    return null;
+  }
+
+  if (indice === 0) {
+    return obtenerTareas();
+  }
+
+  return filtrarTareasPorEstado(estados[indice - 1]).valor;
+};
 
 export const mostrarMenu = () => {
   let seguir = true;
@@ -25,7 +53,12 @@ export const mostrarMenu = () => {
 
     switch (opcion) {
       case "1": {
-        mostrarTareas();
+        const lista = elegirVista();
+
+        if (lista !== null) {
+          mostrarTareas(lista);
+        }
+
         break;
       }
 
@@ -33,28 +66,32 @@ export const mostrarMenu = () => {
         const titulo = rl.question("Titulo: ");
         const descripcion = rl.question("Descripcion: ");
 
-        const tarea = agregarTarea(titulo, descripcion);
+        const resultado = agregarTarea(titulo, descripcion);
 
-        if (!tarea) {
-          console.log("No se pudo agregar la tarea");
+        if (!resultado.ok) {
+          console.log(resultado.error);
           break;
         }
 
-        console.log(`Tarea creada con el ID ${tarea.id}`);
+        console.log(`Tarea creada con el ID ${resultado.valor.id}`);
         break;
       }
 
       case "3": {
         if (!hayTareas()) {
-          console.log("No hay tareas");
+          console.log(ERRORES.SIN_TAREAS);
           break;
         }
+
+        mostrarTareas();
 
         const id = rl.questionInt("ID: ");
         const estado = rl.question("Estado: ");
 
-        if (!cambiarEstado(id, estado)) {
-          console.log("No se pudo cambiar el estado");
+        const resultado = cambiarEstado(id, estado);
+
+        if (!resultado.ok) {
+          console.log(resultado.error);
           break;
         }
 
@@ -63,8 +100,8 @@ export const mostrarMenu = () => {
       }
 
       case "4": {
-        if (!hayTareas()) {
-          console.log("No hay tareas");
+       if (!hayTareas()) {
+          console.log(ERRORES.SIN_TAREAS);
           break;
         }
 
@@ -73,8 +110,10 @@ export const mostrarMenu = () => {
         const id = rl.questionInt("ID: ");
         const dificultad = rl.questionInt("Dificultad (1-3): ");
 
-        if (!cambiarDificultad(id, dificultad)) {
-          console.log("No se pudo cambiar la dificultad");
+        const resultado = cambiarDificultad(id, dificultad);
+
+        if (!resultado.ok) {
+          console.log(resultado.error);
           break;
         }
 
@@ -83,8 +122,8 @@ export const mostrarMenu = () => {
       }
 
       case "5": {
-        if (!hayTareas()) {
-          console.log("No hay tareas");
+       if (!hayTareas()) {
+          console.log(ERRORES.SIN_TAREAS);
           break;
         }
 
@@ -93,10 +132,7 @@ export const mostrarMenu = () => {
         const id = rl.questionInt("ID: ");
         const vencimiento = rl.question("Vencimiento: ");
 
-        if (!setearVencimiento(id, vencimiento)) {
-          console.log("No se pudo setear el vencimiento");
-          break;
-        }
+        // TODO
 
         console.log("Vencimiento seteado");
         break;
