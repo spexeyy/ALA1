@@ -6,7 +6,6 @@ const tareas = [];
 let siguienteId = 1;
 
 const exito = (valor = null) => ({ ok: true, valor });
-
 const fallo = (error) => ({ ok: false, error });
 
 const actualizarFechaModificacion = (tarea) => {
@@ -99,6 +98,23 @@ export const cambiarDificultad = (id, nuevaDificultad) => {
 
   return exito(tarea);
 };
+
+export const cambiarTitulo = (id, titulo) => {
+  if (!titulo || titulo.trim() === "") {
+    return fallo(ERRORES.TITULO_VACIO);
+  }
+
+  const tarea = buscarTareaPorId(id);
+
+  if (!tarea) {
+    return fallo(ERRORES.TAREA_NO_ENCONTRADA);
+  }
+
+  tarea.titulo = titulo.trim();
+  actualizarFechaModificacion(tarea);
+
+  return exito(tarea);
+}
 
 export const obtenerTareas = () => {
   return [...tareas];
