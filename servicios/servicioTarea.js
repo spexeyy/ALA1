@@ -1,46 +1,55 @@
-import { ESTADOS, DIFICULTADES } from "../constantes/tarea.js";
-import { ERRORES } from "../constantes/errores.js"
+import { LIMITES } from "../constantes/tarea.js";
+import { ERRORES } from "../constantes/errores.js";
 import { crearTarea } from "../modelos/modeloTarea.js";
 
 const tareas = [];
 let siguienteId = 1;
 
-const exito = (valor = null) => ({ ok: true, valor });
-const fallo = (error) => ({ ok: false, error });
+export const parsearFecha = (texto) => {
+  const partes = texto.split("/");
 
-const actualizarFechaModificacion = (tarea) => {
-  tarea.fechaModificacion = new Date();
-};
-
-const esEstadoValido = (estado) => {
-  return Object.values(ESTADOS).includes(estado);
-};
-
-const esDificultadValida = (dificultad) => {
-  return Object.values(DIFICULTADES).includes(dificultad);
-};
-
-export const hayTareas = () => {
-  return tareas.length > 0;
-};
-
-export const filtrarTareasPorEstado = (estado) => {
-  if (!esEstadoValido(estado)) {
-    return fallo(ERRORES.ESTADO_INVALIDO);
+  if (partes.length !== 3) {
+    return null;
   }
 
-  const encontrados = [];
+  const dia = Number(partes[0]);
+  const mes = Number(partes[1]);
+  const anio = Number(partes[2]);
+  const fecha = new Date(anio, mes - 1, dia);
 
-  for (const tarea of tareas) {
-    if (tarea.estado === estado) {
-      encontrados.push(tarea);
-    }
+  // date acomoda los desbordes (32/01 -> 01/02), asi que comparamos de vuelta
+  if (
+    fecha.getDate() !== dia ||
+    fecha.getMonth() !== mes - 1 ||
+    fecha.getFullYear() !== anio
+  ) {
+    return null;
   }
 
-  return exito(encontrados);
-}
+  return fecha;
+};
 
-const buscarTareaPorId = (id) => {
+export const errorTitulo = (titulo) => {
+  if (titulo.trim() === "") {
+    return ERRORES.TITULO_VACIO;
+  }
+
+  if (titulo.trim().length > LIMITES.TITULO) {
+    return ERRORES.TITULO_LARGO;
+  }
+
+  return null;
+};
+
+export const errorDescripcion = (descripcion) => {
+  if (descripcion.trim().length > LIMITES.DESCRIPCION) {
+    return ERRORES.DESCRIPCION_LARGA;
+  }
+
+  return null;
+};
+
+export const buscarTareaPorId = (id) => {
   for (const tarea of tareas) {
     if (tarea.id === id) {
       return tarea;
@@ -50,72 +59,67 @@ const buscarTareaPorId = (id) => {
   return null;
 };
 
-export const agregarTarea = (titulo, descripcion) => {
-  if (!titulo || titulo.trim() === "") {
-    return fallo(ERRORES.TITULO_VACIO);
-  }
-
-  const tarea = crearTarea(siguienteId, titulo, descripcion);
+export const agregarTarea = (titulo, descripcion, estado, dificultad, vencimiento) => {
+  const tarea = crearTarea(
+    siguienteId,
+    titulo,
+    descripcion,
+    estado,
+    dificultad,
+    vencimiento,
+  );
 
   tareas.push(tarea);
   siguienteId++;
 
-  return exito(tarea);
+  return tarea;
 };
 
-export const cambiarEstado = (id, nuevoEstado) => {
-  if (!esEstadoValido(nuevoEstado)) {
-    return fallo(ERRORES.ESTADO_INVALIDO);
-  }
-
-  // reemplazar con .find cuando sea posible
+export const editarTarea = (
+  id,
+  titulo,
+  descripcion,
+  estado,
+  dificultad,
+  vencimiento,
+) => {
   const tarea = buscarTareaPorId(id);
 
-  if (!tarea) {
-    return fallo(ERRORES.TAREA_NO_ENCONTRADA);
-  }
+  tarea.titulo = titulo;
+  tarea.descripcion = descripcion;
+  tarea.estado = estado;
+  tarea.dificultad = dificultad;
+  tarea.vencimiento = vencimiento;
+  tarea.fechaModificacion = new Date();
 
-  tarea.estado = nuevoEstado;
-  actualizarFechaModificacion(tarea);
-
-  return exito(tarea);
+  return tarea;
 };
-
-export const cambiarDificultad = (id, nuevaDificultad) => {
-  if (!esDificultadValida(nuevaDificultad)) {
-    return fallo(ERRORES.DIFICULTAD_INVALIDA);
-  }
-
-  // reemplazar con .find cuando sea posible
-  const tarea = buscarTareaPorId(id);
-
-  if (!tarea) {
-    return fallo(ERRORES.TAREA_NO_ENCONTRADA);
-  }
-
-  tarea.dificultad = nuevaDificultad;
-  actualizarFechaModificacion(tarea);
-
-  return exito(tarea);
-};
-
-export const cambiarTitulo = (id, titulo) => {
-  if (!titulo || titulo.trim() === "") {
-    return fallo(ERRORES.TITULO_VACIO);
-  }
-
-  const tarea = buscarTareaPorId(id);
-
-  if (!tarea) {
-    return fallo(ERRORES.TAREA_NO_ENCONTRADA);
-  }
-
-  tarea.titulo = titulo.trim();
-  actualizarFechaModificacion(tarea);
-
-  return exito(tarea);
-}
 
 export const obtenerTareas = () => {
   return [...tareas];
+};
+
+export const filtrarTareasPorEstado = (estado) => {
+  const encontradas = [];
+
+  for (const tarea of tareas) {
+    if (tarea.estado === estado) {
+      encontradas.push(tarea);
+    }
+  }
+
+  return encontradas;
+};
+
+export const buscarTareasPorTitulo = (clave) => {
+  const buscado = clave.trim().toLowerCase();
+  const encontradas = [];
+
+  for (const tarea of tareas) {
+    if (tarea.titulo.toLowerCase().includes(buscado)) {
+      encontradas.push(tarea);
+    }
+  }
+
+  return encontradas;
 };

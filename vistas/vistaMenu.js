@@ -1,151 +1,135 @@
 import rl from "readline-sync";
 import {
   agregarTarea,
-  cambiarEstado,
-  cambiarDificultad,
-  filtrarTareasPorEstado,
-  hayTareas,
   obtenerTareas,
+  filtrarTareasPorEstado,
+  buscarTareasPorTitulo,
 } from "../servicios/servicioTarea.js";
-import { mostrarTareas } from "./vistaTarea.js";
-import { ERRORES } from "../constantes/errores.js"
-import { ESTADOS } from "../constantes/tarea.js";
+import { ESTADOS, DIFICULTADES } from "../constantes/tarea.js";
+import { ERRORES } from "../constantes/errores.js";
+import {
+  elegirOpcion,
+  elegirTarea,
+  pedirTitulo,
+  pedirDescripcion,
+  pedirVencimiento,
+  pedirEstado,
+  pedirDificultad,
+} from "./entrada.js";
+import { mostrarVistaDetalle } from "./vistaTarea.js";
 
-// Submenu de "Ver tareas". Devuelve la lista elegida, o null si el usuario vuelve.
-const elegirVista = () => {
-  const estados = Object.values(ESTADOS);
-  const opciones = [`Todas (${obtenerTareas().length})`];
-
-  for (const estado of estados) {
-    opciones.push(`${estado} (${filtrarTareasPorEstado(estado).valor.length})`);
+const mostrarVistaListado = (tareas) => {
+  if (tareas.length === 0) {
+    console.log(ERRORES.SIN_TAREAS);
+    return;
   }
 
-  const indice = rl.keyInSelect(opciones, "Ver: ", {
-    cancel: "Volver",
-    guide: false,
-  });
-
-  if (indice === -1) {
-    return null;
-  }
-
-  if (indice === 0) {
-    return obtenerTareas();
-  }
-
-  return filtrarTareasPorEstado(estados[indice - 1]).valor;
-};
-
-export const mostrarMenu = () => {
+  const ordenadas = tareas.sort((a, b) => a.titulo.localeCompare(b.titulo));
   let seguir = true;
 
   while (seguir) {
-    console.log(`
-1. Ver tareas
-2. Agregar tarea
-3. Cambiar estado
-4. Cambiar dificultad
-5. Setear vencimiento
-0. Salir
-    `);
+    const tarea = elegirTarea(ordenadas);
 
-    const opcion = rl.question("Elegi una opcion: ");
+    if (tarea === null) {
+      seguir = false;
+    } else {
+      mostrarVistaDetalle(tarea);
+    }
+  }
+};
 
-    switch (opcion) {
-      case "1": {
-        const lista = elegirVista();
+const mostrarMenuVerTareas = () => {
+  const opciones = ["Todas", "Pendientes", "En curso", "Terminadas"];
+  let seguir = true;
 
-        if (lista !== null) {
-          mostrarTareas(lista);
-        }
+  while (seguir) {
+    const indice = elegirOpcion(opciones, "Ver mis tareas: ", "Volver");
 
+    switch (indice) {
+      case 0:
+        mostrarVistaListado(obtenerTareas());
         break;
-      }
 
-      case "2": {
-        const titulo = rl.question("Titulo: ");
-        const descripcion = rl.question("Descripcion: ");
-
-        const resultado = agregarTarea(titulo, descripcion);
-
-        if (!resultado.ok) {
-          console.log(resultado.error);
-          break;
-        }
-
-        console.log(`Tarea creada con el ID ${resultado.valor.id}`);
+      case 1:
+        mostrarVistaListado(filtrarTareasPorEstado(ESTADOS.PENDIENTE));
         break;
-      }
 
-      case "3": {
-        if (!hayTareas()) {
-          console.log(ERRORES.SIN_TAREAS);
-          break;
-        }
-
-        mostrarTareas();
-
-        const id = rl.questionInt("ID: ");
-        const estado = rl.question("Estado: ");
-
-        const resultado = cambiarEstado(id, estado);
-
-        if (!resultado.ok) {
-          console.log(resultado.error);
-          break;
-        }
-
-        console.log(`Estado cambiado a ${estado}`);
+      case 2:
+        mostrarVistaListado(filtrarTareasPorEstado(ESTADOS.EN_CURSO));
         break;
-      }
 
-      case "4": {
-       if (!hayTareas()) {
-          console.log(ERRORES.SIN_TAREAS);
-          break;
-        }
-
-        mostrarTareas();
-
-        const id = rl.questionInt("ID: ");
-        const dificultad = rl.questionInt("Dificultad (1-3): ");
-
-        const resultado = cambiarDificultad(id, dificultad);
-
-        if (!resultado.ok) {
-          console.log(resultado.error);
-          break;
-        }
-
-        console.log(`Dificultad cambiada a ${dificultad}`);
+      case 3:
+        mostrarVistaListado(filtrarTareasPorEstado(ESTADOS.TERMINADA));
         break;
-      }
 
-      case "5": {
-       if (!hayTareas()) {
-          console.log(ERRORES.SIN_TAREAS);
-          break;
-        }
-
-        mostrarTareas();
-
-        const id = rl.questionInt("ID: ");
-        const vencimiento = rl.question("Vencimiento: ");
-
-        // TODO
-
-        console.log("Vencimiento seteado");
-        break;
-      }
-
-      case "0": {
+      case -1:
         seguir = false;
         break;
-      }
+    }
+  }
+};
 
-      default: {
-        console.log("Opcion invalida");
-      }
+const mostrarMenuBuscar = () => {
+  const clave = rl.question("Buscar: ");
+
+  if (clave.trim() === "") {
+    console.log(ERRORES.CLAVE_VACIA);
+    return;
+  }
+
+  const encontradas = buscarTareasPorTitulo(clave);
+
+  if (encontradas.length === 0) {
+    console.log(ERRORES.SIN_RESULTADOS);
+    return;
+  }
+
+  mostrarVistaListado(encontradas);
+};
+
+const mostrarMenuAgregar = () => {
+  console.log("\nDeja vacio lo que no quieras cargar.");
+
+  const titulo = pedirTitulo("");
+  const descripcion = pedirDescripcion("");
+  const vencimiento = pedirVencimiento(null);
+  const estado = pedirEstado(ESTADOS.PENDIENTE);
+  const dificultad = pedirDificultad(DIFICULTADES.FACIL);
+
+  const tarea = agregarTarea(
+    titulo,
+    descripcion,
+    estado,
+    dificultad,
+    vencimiento,
+  );
+
+  console.log(`\nTarea guardada con el ID ${tarea.id}`);
+};
+
+export const mostrarMenu = () => {
+  const opciones = ["Ver mis tareas", "Buscar una tarea", "Agregar una tarea"];
+  let seguir = true;
+
+  while (seguir) {
+    const indice = elegirOpcion(opciones, "Menu principal: ", "Salir");
+
+    switch (indice) {
+      case 0:
+        mostrarMenuVerTareas();
+        break;
+
+      case 1:
+        mostrarMenuBuscar();
+        break;
+
+      case 2:
+        mostrarMenuAgregar();
+        break;
+
+      case -1:
+        seguir = false;
+        break;
     }
   }
 };
