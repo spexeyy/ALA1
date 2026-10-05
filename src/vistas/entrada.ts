@@ -10,14 +10,19 @@ import {
   NOMBRES_DIFICULTAD,
 } from "../constantes/tarea.js";
 import { ERRORES } from "../constantes/errores.js";
+import type { Tarea } from "../modelos/modeloTarea.js";
 
-export const elegirOpcion = (opciones, titulo, cancelar) => {
+export const elegirOpcion = (
+  opciones: string[],
+  titulo: string,
+  cancelar: string,
+): number => {
   return rl.keyInSelect(opciones, titulo, { cancel: cancelar, guide: false });
 };
 
 // en los pedirX, actual es el valor que ya tiene la tarea:
 // dejar vacio lo mantiene.
-export const pedirTitulo = (actual) => {
+export const pedirTitulo = (actual: string): string => {
   while (true) {
     const texto = rl.question("Titulo: ");
 
@@ -35,7 +40,7 @@ export const pedirTitulo = (actual) => {
   }
 };
 
-export const pedirDescripcion = (actual) => {
+export const pedirDescripcion = (actual: string): string => {
   while (true) {
     const texto = rl.question("Descripcion: ");
 
@@ -53,7 +58,7 @@ export const pedirDescripcion = (actual) => {
   }
 };
 
-export const pedirVencimiento = (actual) => {
+export const pedirVencimiento = (actual: Date | null): Date | null => {
   while (true) {
     const texto = rl.question("Vencimiento dd/mm/aaaa: ");
 
@@ -75,7 +80,7 @@ export const pedirVencimiento = (actual) => {
   }
 };
 
-export const pedirEstado = (actual) => {
+export const pedirEstado = (actual: string): string => {
   const estados = Object.values(ESTADOS);
   const indice = elegirOpcion(estados, "Estado: ", "Dejar como esta");
 
@@ -86,7 +91,7 @@ export const pedirEstado = (actual) => {
   return estados[indice];
 };
 
-export const pedirDificultad = (actual) => {
+export const pedirDificultad = (actual: number): number => {
   const nombres = Object.values(NOMBRES_DIFICULTAD);
   const indice = elegirOpcion(nombres, "Dificultad: ", "Dejar como esta");
 
@@ -97,8 +102,8 @@ export const pedirDificultad = (actual) => {
   return Object.values(DIFICULTADES)[indice];
 };
 
-export const elegirTarea = (tareas) => {
-  const titulos = [];
+export const elegirTarea = (tareas: Tarea[]): Tarea | null => {
+  const titulos: string[] = [];
 
   for (const tarea of tareas) {
     titulos.push(`${tarea.titulo} | ${tarea.estado}`);

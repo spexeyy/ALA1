@@ -8,16 +8,17 @@ import {
   pedirEstado,
   pedirDificultad,
 } from "./entrada.js";
+import type { Tarea } from "../modelos/modeloTarea.js";
 
 const SIN_DATOS = "Sin datos";
 
-const mostrarDificultad = (dificultad) => {
+const mostrarDificultad = (dificultad: number): string => {
   const total = Object.keys(DIFICULTADES).length;
 
   return "★".repeat(dificultad) + "☆".repeat(total - dificultad);
 };
 
-const mostrarFecha = (fecha) => {
+const mostrarFecha = (fecha: Date | null): string => {
   if (fecha === null) {
     return SIN_DATOS;
   }
@@ -25,7 +26,7 @@ const mostrarFecha = (fecha) => {
   return fecha.toLocaleDateString("es-AR");
 };
 
-const mostrarTexto = (texto) => {
+const mostrarTexto = (texto: string): string => {
   if (texto === "") {
     return SIN_DATOS;
   }
@@ -33,7 +34,7 @@ const mostrarTexto = (texto) => {
   return texto;
 };
 
-const mostrarDetalle = (tarea) => {
+const mostrarDetalle = (tarea: Tarea): void => {
   console.log(`
 Titulo:         ${tarea.titulo}
 Descripcion:    ${mostrarTexto(tarea.descripcion)}
@@ -44,7 +45,7 @@ Creacion:       ${mostrarFecha(tarea.fechaCreacion)}
 Ultima edicion: ${mostrarFecha(tarea.fechaModificacion)}`);
 };
 
-const editar = (tarea) => {
+const editar = (tarea: Tarea): void => {
   console.log(
     "\nDeja vacio para mantener el valor actual o escribi un espacio para borrarlo.",
   );
@@ -60,7 +61,7 @@ const editar = (tarea) => {
   console.log("\nTarea guardada");
 };
 
-export const mostrarVistaDetalle = (tarea) => {
+export const mostrarVistaDetalle = (tarea: Tarea): void => {
   const opciones = ["Editar la tarea", "Eliminar la tarea"];
   let seguir = true;
 

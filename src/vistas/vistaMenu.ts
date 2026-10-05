@@ -17,8 +17,9 @@ import {
   pedirDificultad,
 } from "./entrada.js";
 import { mostrarVistaDetalle } from "./vistaTarea.js";
+import type { Tarea } from "../modelos/modeloTarea.js";
 
-const mostrarVistaListado = (tareas) => {
+const mostrarVistaListado = (tareas: Tarea[]): void => {
   if (tareas.length === 0) {
     console.log(ERRORES.SIN_TAREAS);
     return;
@@ -32,7 +33,7 @@ const mostrarVistaListado = (tareas) => {
   }
 };
 
-const mostrarMenuVerTareas = () => {
+const mostrarMenuVerTareas = (): void => {
   const opciones = [
     "Todas",
     "Pendientes",
@@ -73,7 +74,7 @@ const mostrarMenuVerTareas = () => {
   }
 };
 
-const mostrarMenuBuscar = () => {
+const mostrarMenuBuscar = (): void => {
   const clave = rl.question("Buscar: ");
 
   if (clave.trim() === "") {
@@ -91,7 +92,7 @@ const mostrarMenuBuscar = () => {
   mostrarVistaListado(encontradas);
 };
 
-const mostrarMenuAgregar = () => {
+const mostrarMenuAgregar = (): void => {
   console.log("\nDeja vacio lo que no quieras cargar.");
 
   const titulo = pedirTitulo("");
@@ -111,7 +112,7 @@ const mostrarMenuAgregar = () => {
   console.log(`\nTarea guardada con el ID ${tarea.id}`);
 };
 
-export const mostrarMenu = () => {
+export const mostrarMenu = (): void => {
   const opciones = ["Ver mis tareas", "Buscar una tarea", "Agregar una tarea"];
   let seguir = true;
 

@@ -1,11 +1,12 @@
 import { LIMITES } from "../constantes/tarea.js";
 import { ERRORES } from "../constantes/errores.js";
 import { crearTarea } from "../modelos/modeloTarea.js";
+import type { Tarea } from "../modelos/modeloTarea.js";
 
-const tareas = [];
+const tareas: Tarea[] = [];
 let siguienteId = 1;
 
-export const parsearFecha = (texto) => {
+export const parsearFecha = (texto: string): Date | null => {
   const partes = texto.split("/");
 
   if (partes.length !== 3) {
@@ -29,7 +30,7 @@ export const parsearFecha = (texto) => {
   return fecha;
 };
 
-export const errorTitulo = (titulo) => {
+export const errorTitulo = (titulo: string): string | null => {
   if (titulo.trim() === "") {
     return ERRORES.TITULO_VACIO;
   }
@@ -41,7 +42,7 @@ export const errorTitulo = (titulo) => {
   return null;
 };
 
-export const errorDescripcion = (descripcion) => {
+export const errorDescripcion = (descripcion: string): string | null => {
   if (descripcion.trim().length > LIMITES.DESCRIPCION) {
     return ERRORES.DESCRIPCION_LARGA;
   }
@@ -49,7 +50,7 @@ export const errorDescripcion = (descripcion) => {
   return null;
 };
 
-export const buscarTareaPorId = (id) => {
+export const buscarTareaPorId = (id: number): Tarea | null => {
   for (const tarea of tareas) {
     if (tarea.id === id) {
       return tarea;
@@ -59,7 +60,13 @@ export const buscarTareaPorId = (id) => {
   return null;
 };
 
-export const agregarTarea = (titulo, descripcion, estado, dificultad, vencimiento) => {
+export const agregarTarea = (
+  titulo: string,
+  descripcion: string,
+  estado: string,
+  dificultad: number,
+  vencimiento: Date | null,
+): Tarea => {
   const tarea = crearTarea(
     siguienteId,
     titulo,
@@ -76,14 +83,18 @@ export const agregarTarea = (titulo, descripcion, estado, dificultad, vencimient
 };
 
 export const editarTarea = (
-  id,
-  titulo,
-  descripcion,
-  estado,
-  dificultad,
-  vencimiento,
-) => {
+  id: number,
+  titulo: string,
+  descripcion: string,
+  estado: string,
+  dificultad: number,
+  vencimiento: Date | null,
+): Tarea | null => {
   const tarea = buscarTareaPorId(id);
+
+  if (tarea === null) {
+    return null;
+  }
 
   tarea.titulo = titulo;
   tarea.descripcion = descripcion;
@@ -95,7 +106,7 @@ export const editarTarea = (
   return tarea;
 };
 
-export const eliminarTarea = (id) => {
+export const eliminarTarea = (id: number): void => {
   for (let i = 0; i < tareas.length; i++) {
     if (tareas[i].id === id) {
       tareas.splice(i, 1);
@@ -103,12 +114,12 @@ export const eliminarTarea = (id) => {
   }
 };
 
-export const obtenerTareas = () => {
+export const obtenerTareas = (): Tarea[] => {
   return [...tareas];
 };
 
-export const filtrarTareasPorEstado = (estado) => {
-  const encontradas = [];
+export const filtrarTareasPorEstado = (estado: string): Tarea[] => {
+  const encontradas: Tarea[] = [];
 
   for (const tarea of tareas) {
     if (tarea.estado === estado) {
@@ -119,9 +130,9 @@ export const filtrarTareasPorEstado = (estado) => {
   return encontradas;
 };
 
-export const buscarTareasPorTitulo = (clave) => {
+export const buscarTareasPorTitulo = (clave: string): Tarea[] => {
   const buscado = clave.trim().toLowerCase();
-  const encontradas = [];
+  const encontradas: Tarea[] = [];
 
   for (const tarea of tareas) {
     if (tarea.titulo.toLowerCase().includes(buscado)) {

@@ -2,9 +2,9 @@
   "name": "to-do",
   "version": "1.0.0",
   "description": "",
-  "main": "src/index.js",
+  "main": "dist/index.js",
   "scripts": {
-    "start": "node src/index.js"
+    "start": "tsc && node dist/index.js"
   },
   "keywords": [],
   "author": "",
@@ -12,5 +12,9 @@
   "type": "module",
   "dependencies": {
     "readline-sync": "^1.4.10"
+  },
+  "devDependencies": {
+    "@types/readline-sync": "1.4.8",
+    "typescript": "7.0.2"
   }
 }
