@@ -95,6 +95,14 @@ export const editarTarea = (
   return tarea;
 };
 
+export const eliminarTarea = (id) => {
+  for (let i = 0; i < tareas.length; i++) {
+    if (tareas[i].id === id) {
+      tareas.splice(i, 1);
+    }
+  }
+};
+
 export const obtenerTareas = () => {
   return [...tareas];
 };

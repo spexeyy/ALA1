@@ -25,21 +25,21 @@ const mostrarVistaListado = (tareas) => {
   }
 
   const ordenadas = tareas.sort((a, b) => a.titulo.localeCompare(b.titulo));
-  let seguir = true;
+  const tarea = elegirTarea(ordenadas);
 
-  while (seguir) {
-    const tarea = elegirTarea(ordenadas);
-
-    if (tarea === null) {
-      seguir = false;
-    } else {
-      mostrarVistaDetalle(tarea);
-    }
+  if (tarea !== null) {
+    mostrarVistaDetalle(tarea);
   }
 };
 
 const mostrarMenuVerTareas = () => {
-  const opciones = ["Todas", "Pendientes", "En curso", "Terminadas"];
+  const opciones = [
+    "Todas",
+    "Pendientes",
+    "En curso",
+    "Terminadas",
+    "Canceladas",
+  ];
   let seguir = true;
 
   while (seguir) {
@@ -60,6 +60,10 @@ const mostrarMenuVerTareas = () => {
 
       case 3:
         mostrarVistaListado(filtrarTareasPorEstado(ESTADOS.TERMINADA));
+        break;
+
+      case 4:
+        mostrarVistaListado(filtrarTareasPorEstado(ESTADOS.CANCELADA));
         break;
 
       case -1:

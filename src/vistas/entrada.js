@@ -61,6 +61,10 @@ export const pedirVencimiento = (actual) => {
       return actual;
     }
 
+    if (texto.trim() === "") {
+      return null;
+    }
+
     const fecha = parsearFecha(texto.trim());
 
     if (fecha !== null) {

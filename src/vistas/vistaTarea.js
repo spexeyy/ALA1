@@ -1,5 +1,5 @@
 import { DIFICULTADES } from "../constantes/tarea.js";
-import { editarTarea } from "../servicios/servicioTarea.js";
+import { editarTarea, eliminarTarea } from "../servicios/servicioTarea.js";
 import {
   elegirOpcion,
   pedirTitulo,
@@ -45,7 +45,9 @@ Ultima edicion: ${mostrarFecha(tarea.fechaModificacion)}`);
 };
 
 const editar = (tarea) => {
-  console.log("\nDeja vacio para mantener el valor actual.");
+  console.log(
+    "\nDeja vacio para mantener el valor actual o escribi un espacio para borrarlo.",
+  );
 
   const titulo = pedirTitulo(tarea.titulo);
   const descripcion = pedirDescripcion(tarea.descripcion);
@@ -59,17 +61,28 @@ const editar = (tarea) => {
 };
 
 export const mostrarVistaDetalle = (tarea) => {
+  const opciones = ["Editar la tarea", "Eliminar la tarea"];
   let seguir = true;
 
   while (seguir) {
     mostrarDetalle(tarea);
 
-    const indice = elegirOpcion(["Editar la tarea"], "Detalle: ", "Volver");
+    const indice = elegirOpcion(opciones, "Detalle: ", "Volver");
 
-    if (indice === -1) {
-      seguir = false;
-    } else {
-      editar(tarea);
+    switch (indice) {
+      case 0:
+        editar(tarea);
+        break;
+
+      case 1:
+        eliminarTarea(tarea.id);
+        console.log("\nTarea eliminada");
+        seguir = false;
+        break;
+
+      case -1:
+        seguir = false;
+        break;
     }
   }
 };
