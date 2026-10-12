@@ -7,6 +7,31 @@ export type Tarea = {
   vencimiento: Date | null;
   fechaCreacion: Date;
   fechaModificacion: Date;
+  editar(
+    titulo: string,
+    descripcion: string,
+    estado: string,
+    dificultad: number,
+    vencimiento: Date | null,
+  ): void;
+};
+
+const prototipoTarea = {
+  editar(
+    this: Tarea,
+    titulo: string,
+    descripcion: string,
+    estado: string,
+    dificultad: number,
+    vencimiento: Date | null,
+  ): void {
+    this.titulo = titulo;
+    this.descripcion = descripcion;
+    this.estado = estado;
+    this.dificultad = dificultad;
+    this.vencimiento = vencimiento;
+    this.fechaModificacion = new Date();
+  },
 };
 
 export const crearTarea = (
@@ -17,16 +42,17 @@ export const crearTarea = (
   dificultad: number,
   vencimiento: Date | null,
 ): Tarea => {
+  const tarea: Tarea = Object.create(prototipoTarea);
   const ahora = new Date();
 
-  return {
-    id,
-    titulo,
-    descripcion,
-    estado,
-    dificultad,
-    vencimiento,
-    fechaCreacion: ahora,
-    fechaModificacion: ahora,
-  };
+  tarea.id = id;
+  tarea.titulo = titulo;
+  tarea.descripcion = descripcion;
+  tarea.estado = estado;
+  tarea.dificultad = dificultad;
+  tarea.vencimiento = vencimiento;
+  tarea.fechaCreacion = ahora;
+  tarea.fechaModificacion = ahora;
+
+  return tarea;
 };

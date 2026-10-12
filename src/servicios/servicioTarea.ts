@@ -3,9 +3,6 @@ import { ERRORES } from "../constantes/errores.js";
 import { crearTarea } from "../modelos/modeloTarea.js";
 import type { Tarea } from "../modelos/modeloTarea.js";
 
-const tareas: Tarea[] = [];
-let siguienteId = 1;
-
 export const parsearFecha = (texto: string): Date | null => {
   const partes = texto.split("/");
 
@@ -50,95 +47,66 @@ export const errorDescripcion = (descripcion: string): string | null => {
   return null;
 };
 
-export const buscarTareaPorId = (id: number): Tarea | null => {
-  for (const tarea of tareas) {
-    if (tarea.id === id) {
-      return tarea;
+export const listaTareas = {
+  tareas: [] as Tarea[],
+  siguienteId: 1,
+
+  agregar(
+    titulo: string,
+    descripcion: string,
+    estado: string,
+    dificultad: number,
+    vencimiento: Date | null,
+  ): Tarea {
+    const tarea = crearTarea(
+      this.siguienteId,
+      titulo,
+      descripcion,
+      estado,
+      dificultad,
+      vencimiento,
+    );
+
+    this.tareas.push(tarea);
+    this.siguienteId++;
+
+    return tarea;
+  },
+
+  eliminar(id: number): void {
+    for (let i = 0; i < this.tareas.length; i++) {
+      if (this.tareas[i].id === id) {
+        this.tareas.splice(i, 1);
+      }
     }
-  }
+  },
 
-  return null;
-};
+  obtenerTodas(): Tarea[] {
+    return [...this.tareas];
+  },
 
-export const agregarTarea = (
-  titulo: string,
-  descripcion: string,
-  estado: string,
-  dificultad: number,
-  vencimiento: Date | null,
-): Tarea => {
-  const tarea = crearTarea(
-    siguienteId,
-    titulo,
-    descripcion,
-    estado,
-    dificultad,
-    vencimiento,
-  );
+  filtrarPorEstado(estado: string): Tarea[] {
+    const encontradas: Tarea[] = [];
 
-  tareas.push(tarea);
-  siguienteId++;
-
-  return tarea;
-};
-
-export const editarTarea = (
-  id: number,
-  titulo: string,
-  descripcion: string,
-  estado: string,
-  dificultad: number,
-  vencimiento: Date | null,
-): Tarea | null => {
-  const tarea = buscarTareaPorId(id);
-
-  if (tarea === null) {
-    return null;
-  }
-
-  tarea.titulo = titulo;
-  tarea.descripcion = descripcion;
-  tarea.estado = estado;
-  tarea.dificultad = dificultad;
-  tarea.vencimiento = vencimiento;
-  tarea.fechaModificacion = new Date();
-
-  return tarea;
-};
-
-export const eliminarTarea = (id: number): void => {
-  for (let i = 0; i < tareas.length; i++) {
-    if (tareas[i].id === id) {
-      tareas.splice(i, 1);
+    for (const tarea of this.tareas) {
+      if (tarea.estado === estado) {
+        encontradas.push(tarea);
+      }
     }
-  }
-};
 
-export const obtenerTareas = (): Tarea[] => {
-  return [...tareas];
-};
+    return encontradas;
+  },
 
-export const filtrarTareasPorEstado = (estado: string): Tarea[] => {
-  const encontradas: Tarea[] = [];
+  buscarPorTitulo(clave: string): Tarea[] {
+    const buscado = clave.trim().toLowerCase();
+    const encontradas: Tarea[] = [];
 
-  for (const tarea of tareas) {
-    if (tarea.estado === estado) {
-      encontradas.push(tarea);
+    for (const tarea of this.tareas) {
+      if (tarea.titulo.toLowerCase().includes(buscado)) {
+        encontradas.push(tarea);
+      }
     }
-  }
 
-  return encontradas;
-};
-
-export const buscarTareasPorTitulo = (clave: string): Tarea[] => {
-  const buscado = clave.trim().toLowerCase();
-  const encontradas: Tarea[] = [];
-
-  for (const tarea of tareas) {
-    if (tarea.titulo.toLowerCase().includes(buscado)) {
-      encontradas.push(tarea);
-    }
-  }
-
-  return encontradas;
+    return encontradas;
+  },
 };

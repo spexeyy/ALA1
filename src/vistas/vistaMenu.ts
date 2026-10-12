@@ -1,10 +1,5 @@
 import rl from "readline-sync";
-import {
-  agregarTarea,
-  obtenerTareas,
-  filtrarTareasPorEstado,
-  buscarTareasPorTitulo,
-} from "../servicios/servicioTarea.js";
+import { listaTareas } from "../servicios/servicioTarea.js";
 import { ESTADOS, DIFICULTADES } from "../constantes/tarea.js";
 import { ERRORES } from "../constantes/errores.js";
 import {
@@ -48,23 +43,23 @@ const mostrarMenuVerTareas = (): void => {
 
     switch (indice) {
       case 0:
-        mostrarVistaListado(obtenerTareas());
+        mostrarVistaListado(listaTareas.obtenerTodas());
         break;
 
       case 1:
-        mostrarVistaListado(filtrarTareasPorEstado(ESTADOS.PENDIENTE));
+        mostrarVistaListado(listaTareas.filtrarPorEstado(ESTADOS.PENDIENTE));
         break;
 
       case 2:
-        mostrarVistaListado(filtrarTareasPorEstado(ESTADOS.EN_CURSO));
+        mostrarVistaListado(listaTareas.filtrarPorEstado(ESTADOS.EN_CURSO));
         break;
 
       case 3:
-        mostrarVistaListado(filtrarTareasPorEstado(ESTADOS.TERMINADA));
+        mostrarVistaListado(listaTareas.filtrarPorEstado(ESTADOS.TERMINADA));
         break;
 
       case 4:
-        mostrarVistaListado(filtrarTareasPorEstado(ESTADOS.CANCELADA));
+        mostrarVistaListado(listaTareas.filtrarPorEstado(ESTADOS.CANCELADA));
         break;
 
       case -1:
@@ -82,7 +77,7 @@ const mostrarMenuBuscar = (): void => {
     return;
   }
 
-  const encontradas = buscarTareasPorTitulo(clave);
+  const encontradas = listaTareas.buscarPorTitulo(clave);
 
   if (encontradas.length === 0) {
     console.log(ERRORES.SIN_RESULTADOS);
@@ -101,7 +96,7 @@ const mostrarMenuAgregar = (): void => {
   const estado = pedirEstado(ESTADOS.PENDIENTE);
   const dificultad = pedirDificultad(DIFICULTADES.FACIL);
 
-  const tarea = agregarTarea(
+  const tarea = listaTareas.agregar(
     titulo,
     descripcion,
     estado,

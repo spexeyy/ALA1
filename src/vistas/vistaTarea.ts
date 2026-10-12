@@ -1,5 +1,5 @@
 import { DIFICULTADES } from "../constantes/tarea.js";
-import { editarTarea, eliminarTarea } from "../servicios/servicioTarea.js";
+import { listaTareas } from "../servicios/servicioTarea.js";
 import {
   elegirOpcion,
   pedirTitulo,
@@ -56,7 +56,7 @@ const editar = (tarea: Tarea): void => {
   const estado = pedirEstado(tarea.estado);
   const dificultad = pedirDificultad(tarea.dificultad);
 
-  editarTarea(tarea.id, titulo, descripcion, estado, dificultad, vencimiento);
+  tarea.editar(titulo, descripcion, estado, dificultad, vencimiento);
 
   console.log("\nTarea guardada");
 };
@@ -76,7 +76,7 @@ export const mostrarVistaDetalle = (tarea: Tarea): void => {
         break;
 
       case 1:
-        eliminarTarea(tarea.id);
+        listaTareas.eliminar(tarea.id);
         console.log("\nTarea eliminada");
         seguir = false;
         break;
